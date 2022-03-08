@@ -1,9 +1,10 @@
 import type { NextPage } from 'next';
-import { Fragment } from 'react';
-import { Disclosure, Menu, Transition } from '@headlessui/react';
+import { Disclosure } from '@headlessui/react';
 import { BellIcon, MenuIcon, XIcon } from '@heroicons/react/outline';
 import GroupInput from './components/group-input';
 import Divider from './components/divider';
+import { useState } from 'react';
+import Big from 'big.js';
 
 const user = {
   name: 'Tom Cook',
@@ -23,6 +24,36 @@ function classNames(...classes: string[]) {
 }
 
 const Home: NextPage = () => {
+  const [initPriceA, setInitPriceA] = useState<string>('1');
+  const [initPriceB, setInitPriceB] = useState<string>('2');
+
+  const [futurePriceA, setFuturrePriceA] = useState<string>('1');
+  const [futurePriceB, setFuturePriceB] = useState<string>('6');
+
+  const [initValueA, setInitValueA] = useState<string>('500');
+  const [initValueB, setInitValueB] = useState<string>('500');
+
+  // x * y = k
+  const x = Big(initValueA).div(initPriceA);
+  const y = Big(initValueB).div(initPriceB);
+  const k = x.mul(y);
+
+  const fx = k.mul(futurePriceB).div(futurePriceA).sqrt();
+  const fy = k.mul(futurePriceA).div(futurePriceB).sqrt();
+
+  const fValueA = fx.mul(futurePriceA);
+  const fValueB = fy.mul(futurePriceB);
+
+  const totalHoldValue = x.mul(futurePriceA).add(y.mul(futurePriceB));
+  const totalLiqValue = Big(fValueA).add(fValueB);
+
+  const IL = totalLiqValue
+    .minus(totalHoldValue)
+    .abs()
+    .div(totalHoldValue)
+    .mul(100)
+    .toFixed(2);
+
   return (
     <>
       <div className='min-h-full'>
@@ -32,14 +63,7 @@ const Home: NextPage = () => {
               <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 <div className='flex items-center justify-between h-16'>
                   <div className='flex items-center'>
-                    <div className='flex-shrink-0 text-4xl'>
-                      {/* <img
-                        className='h-8 w-8'
-                        src='https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg'
-                        alt='Workflow'
-                      /> */}
-                      🧮
-                    </div>
+                    <div className='flex-shrink-0 text-4xl'>🧮</div>
                     <div className='hidden md:block'>
                       <div className='ml-10 flex items-baseline space-x-4'>
                         {navigation.map((item) => (
@@ -172,7 +196,7 @@ const Home: NextPage = () => {
                   </h2>
                   <div className='rounded-lg bg-white overflow-hidden shadow'>
                     <div className='p-6'>
-                      <p>Impermanent loss: 2.02%</p>
+                      <p>{`Impermanent loss: ${IL}%`}</p>
                       <Divider />
                       <p>If $500 of Token A and $500 of Token B were held</p>
                       <p>- Have 500.00 Token A and 250.00 Token B</p>
