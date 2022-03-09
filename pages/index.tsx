@@ -205,13 +205,37 @@ const Home: NextPage = () => {
                         <p className='mb-4'>Initial Price</p>
                         <GroupInput
                           label='token A'
-                          register={register}
+                          {...register('initPriceA', {
+                            required: {
+                              value: true,
+                              message: 'this field is required',
+                            },
+                            validate: (value) => {
+                              const n = Big(value);
+                              if (n.lte(Big(0))) {
+                                return 'only positive number';
+                              }
+                              return true;
+                            },
+                          })}
                           name='initPriceA'
                           error={errors.initPriceA}
                         />
                         <GroupInput
                           label='token B'
-                          register={register}
+                          {...register('initPriceB', {
+                            required: {
+                              value: true,
+                              message: 'this field is required',
+                            },
+                            validate: (value) => {
+                              const n = Big(value);
+                              if (n.lte(Big(0))) {
+                                return 'only positive number';
+                              }
+                              return true;
+                            },
+                          })}
                           name='initPriceB'
                           error={errors.initPriceB}
                         />
@@ -220,13 +244,37 @@ const Home: NextPage = () => {
                         <p className='mb-4'>Future Price</p>
                         <GroupInput
                           label='token A'
-                          register={register}
+                          {...register('futurePriceA', {
+                            required: {
+                              value: true,
+                              message: 'this field is required',
+                            },
+                            validate: (value) => {
+                              const n = Big(value);
+                              if (n.lte(Big(0))) {
+                                return 'only positive number';
+                              }
+                              return true;
+                            },
+                          })}
                           name='futurePriceA'
                           error={errors.futurePriceA}
                         />
                         <GroupInput
                           label='token B'
-                          register={register}
+                          {...register('futurePriceB', {
+                            required: {
+                              value: true,
+                              message: 'this field is required',
+                            },
+                            validate: (value) => {
+                              const n = Big(value);
+                              if (n.lte(Big(0))) {
+                                return 'only positive number';
+                              }
+                              return true;
+                            },
+                          })}
                           name='futurePriceB'
                           error={errors.futurePriceB}
                         />
