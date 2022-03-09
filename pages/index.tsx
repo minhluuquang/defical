@@ -5,6 +5,7 @@ import GroupInput from './components/group-input';
 import Divider from './components/divider';
 import { useState } from 'react';
 import Big from 'big.js';
+import { useForm } from 'react-hook-form';
 
 const user = {
   name: 'Tom Cook',
@@ -23,36 +24,61 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
 }
 
+export interface IFormValues {
+  initPriceA: string;
+  initPriceB: string;
+  futurePriceA: string;
+  futurePriceB: string;
+}
+
 const Home: NextPage = () => {
-  const [initPriceA, setInitPriceA] = useState<string>('1');
-  const [initPriceB, setInitPriceB] = useState<string>('2');
-
-  const [futurePriceA, setFuturrePriceA] = useState<string>('1');
-  const [futurePriceB, setFuturePriceB] = useState<string>('6');
-
   const [initValueA, setInitValueA] = useState<string>('500');
   const [initValueB, setInitValueB] = useState<string>('500');
 
-  // x * y = k
-  const x = Big(initValueA).div(initPriceA);
-  const y = Big(initValueB).div(initPriceB);
-  const k = x.mul(y);
+  const [IL, setIL] = useState<string>('0');
+  const [holdValue, setHoldValue] = useState<string>('0');
+  const [liqValue, setLiqValue] = useState<string>('0');
 
-  const fx = k.mul(futurePriceB).div(futurePriceA).sqrt();
-  const fy = k.mul(futurePriceA).div(futurePriceB).sqrt();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormValues>({
+    defaultValues: {
+      initPriceA: '1',
+      initPriceB: '1',
+      futurePriceA: '1',
+      futurePriceB: '1',
+    },
+  });
 
-  const fValueA = fx.mul(futurePriceA);
-  const fValueB = fy.mul(futurePriceB);
+  const onSubmit = (data: IFormValues) => {
+    const { initPriceA, initPriceB, futurePriceA, futurePriceB } = data;
+    // x * y = k
+    const x = Big(initValueA).div(initPriceA);
+    const y = Big(initValueB).div(initPriceB);
+    const k = x.mul(y);
 
-  const totalHoldValue = x.mul(futurePriceA).add(y.mul(futurePriceB));
-  const totalLiqValue = Big(fValueA).add(fValueB);
+    const fx = k.mul(futurePriceB).div(futurePriceA).sqrt();
+    const fy = k.mul(futurePriceA).div(futurePriceB).sqrt();
 
-  const IL = totalLiqValue
-    .minus(totalHoldValue)
-    .abs()
-    .div(totalHoldValue)
-    .mul(100)
-    .toFixed(2);
+    const fValueA = fx.mul(futurePriceA);
+    const fValueB = fy.mul(futurePriceB);
+
+    const totalHoldValue = x.mul(futurePriceA).add(y.mul(futurePriceB));
+    const totalLiqValue = Big(fValueA).add(fValueB);
+
+    const IL = totalLiqValue
+      .minus(totalHoldValue)
+      .abs()
+      .div(totalHoldValue)
+      .mul(100)
+      .toFixed(2);
+
+    setIL(IL);
+    setHoldValue(totalHoldValue.toFixed(2));
+    setLiqValue(totalLiqValue.toFixed(2));
+  };
 
   return (
     <>
@@ -175,14 +201,42 @@ const Home: NextPage = () => {
                   </h2>
                   <div className='rounded-lg bg-white overflow-hidden shadow'>
                     <div className='p-6 min-h-full'>
-                      <p className='mb-4'>Initial Price</p>
-                      <GroupInput label='token A' />
-                      <GroupInput label='token B' />
-                      <Divider />
+                      <form onSubmit={handleSubmit(onSubmit)}>
+                        <p className='mb-4'>Initial Price</p>
+                        <GroupInput
+                          label='token A'
+                          register={register}
+                          name='initPriceA'
+                          error={errors.initPriceA}
+                        />
+                        <GroupInput
+                          label='token B'
+                          register={register}
+                          name='initPriceB'
+                          error={errors.initPriceB}
+                        />
+                        <Divider />
 
-                      <p className='mb-4'>Future Price</p>
-                      <GroupInput label='token A' />
-                      <GroupInput label='token B' />
+                        <p className='mb-4'>Future Price</p>
+                        <GroupInput
+                          label='token A'
+                          register={register}
+                          name='futurePriceA'
+                          error={errors.futurePriceA}
+                        />
+                        <GroupInput
+                          label='token B'
+                          register={register}
+                          name='futurePriceB'
+                          error={errors.futurePriceB}
+                        />
+                        <button
+                          type='submit'
+                          className='w-full justify-center inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'
+                        >
+                          Calculate
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </section>
@@ -200,7 +254,7 @@ const Home: NextPage = () => {
                       <Divider />
                       <p>If $500 of Token A and $500 of Token B were held</p>
                       <p>- Have 500.00 Token A and 250.00 Token B</p>
-                      <p>- Value if held: $1,250.00</p>
+                      <p>{`- Value if held: $${holdValue}`}</p>
                       <Divider />
                       <p>
                         If $500 of Token A and $500 of Token B were provided as
@@ -210,7 +264,7 @@ const Home: NextPage = () => {
                         - Have 612.37 Token A and 204.12 Token B (in liquidity
                         pool)
                       </p>
-                      <p>- Value if providing liquidity: $1,224.74</p>
+                      <p>{`- Value if providing liquidity: $${liqValue}`}</p>
                     </div>
                   </div>
                 </section>
