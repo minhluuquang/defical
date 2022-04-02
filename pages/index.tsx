@@ -14,9 +14,9 @@ import Big from 'big.js';
 import { NextPage } from 'next';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ColorSchemeToggle } from './components/ColorSchemeToggle/ColorSchemeToggle';
+import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { Currency } from 'tabler-icons-react';
-import GroupInput from './components/group-input';
+import GroupInput from '../components/group-input';
 
 export interface IFormValues {
   initPriceA: string;

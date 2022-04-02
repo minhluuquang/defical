@@ -1,6 +1,6 @@
 import React from 'react';
 import { UseFormRegister, Path, FieldError } from 'react-hook-form';
-import { IFormValues } from '../..';
+import { IFormValues } from '../../pages';
 
 interface GroupInputProps {
   label: string;
