@@ -1,12 +1,9 @@
 import {
-  Title,
   Text,
-  Anchor,
   AppShell,
   Header,
   Box,
   Divider,
-  Group,
   Button,
   NumberInput,
 } from '@mantine/core';
@@ -16,7 +13,6 @@ import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ColorSchemeToggle } from '../components/ColorSchemeToggle/ColorSchemeToggle';
 import { Currency } from 'tabler-icons-react';
-import GroupInput from '../components/group-input';
 
 export interface IFormValues {
   initPriceA: string;
